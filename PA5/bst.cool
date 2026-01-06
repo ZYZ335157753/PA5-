@@ -1,0 +1,137 @@
+# 二叉搜索树节点类
+class Node inherits Object {
+    val: Int;       # 节点值
+    left: Node;     # 左子节点
+    right: Node;    # 右子节点
+
+    # 节点构造方法
+    init(v: Int): Node {
+        {
+            val <- v;
+            left <- (new Node).init_null();
+            right <- (new Node).init_null();
+            self;
+        }
+    };
+
+    # 空节点初始化
+    init_null(): Node {
+        {
+            val <- 0;
+            left <- self;
+            right <- self;
+            self;
+        }
+    };
+
+    # 判断是否为空节点
+    is_null(): Bool {
+        (left = self) and (right = self)
+    };
+};
+
+# 二叉搜索树主类
+class BST inherits Object {
+    root: Node;
+
+    # 初始化空树
+    init(): BST {
+        {
+            root <- (new Node).init_null();
+            self;
+        }
+    };
+
+    # 插入节点（对外接口，去重）
+    insert(v: Int): Object {
+        if root.is_null() then
+            root <- (new Node).init(v)
+        else
+            insert_helper(root, v)
+        fi
+    };
+
+    # 插入辅助方法（递归）
+    insert_helper(n: Node, v: Int): Object {
+        if v = n.val then
+            out_string("值已存在，无需插入\n")  # 去重逻辑
+        else if v < n.val then
+            if n.left.is_null() then
+                n.left <- (new Node).init(v)
+            else
+                insert_helper(n.left, v)
+            fi
+        else
+            if n.right.is_null() then
+                n.right <- (new Node).init(v)
+            else
+                insert_helper(n.right, v)
+            fi
+        fi
+    };
+
+    # 查找值是否存在
+    search(v: Int): Bool {
+        if root.is_null() then
+            false
+        else
+            search_helper(root, v)
+        fi
+    };
+
+    # 查找辅助方法（递归）
+    search_helper(n: Node, v: Int): Bool {
+        if n.is_null() then
+            false
+        else if v = n.val then
+            true
+        else if v < n.val then
+            search_helper(n.left, v)
+        else
+            search_helper(n.right, v)
+        fi
+    };
+
+    # 中序打印（左-根-右）
+    printInOrder(): Object {
+        out_string("中序遍历结果：\n");
+        print_helper(root)
+    };
+
+    # 打印辅助方法（递归）
+    print_helper(n: Node): Object {
+        if not n.is_null() then
+            {
+                print_helper(n.left);
+                out_int(n.val);
+                out_string(" ");
+                print_helper(n.right);
+            }
+        else
+            self
+        fi
+    };
+};
+
+# 主类：测试二叉搜索树功能
+class Main inherits IO {
+    main(): Object {
+        let bst: BST <- (new BST).init() in {
+            # 测试插入
+            bst.insert(5);
+            bst.insert(3);
+            bst.insert(7);
+            bst.insert(3);  # 重复值，验证去重
+            # 测试查找
+            out_string("查找3：");
+            out_bool(bst.search(3));
+            out_string("\n");
+            out_string("查找8：");
+            out_bool(bst.search(8));
+            out_string("\n");
+            # 测试中序打印
+            bst.printInOrder();
+            out_string("\n");
+        }
+    };
+};
